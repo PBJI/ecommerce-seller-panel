@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="theme-color" content="#f6f5f1" />
+<title>Merchant Desk · Cloud workspace</title>
+<link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+<div class="auth-gate" id="authGate">
+  <section class="auth-card" aria-labelledby="authTitle">
+    <div class="auth-brand"><div class="brand-mark">MD.</div><div><strong>Merchant Desk</strong><small>Small business, less busywork</small></div></div>
+    <div class="eyebrow">Private workspace</div>
+    <h1 class="auth-title" id="authTitle">Your shop, in one place.</h1>
+    <p class="auth-copy">Sign in with Google to manage products, stock, orders and feeds. Your workspace is saved to your Supabase account. Product image files are stored in your Google Drive; only product metadata and Drive references sync to Supabase.</p>
+    <button class="auth-google" id="googleSignInBtn" type="button" disabled><svg class="google-mark" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.01 13.22l7.98 6.19C11.88 13.72 17.48 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.77 7.18l7.73 6C44.4 37.98 46.98 31.88 46.98 24.55z"/><path fill="#FBBC05" d="M9.99 28.59A14.4 14.4 0 0 1 9.21 24c0-1.59.27-3.12.76-4.59l-7.98-6.19A23.9 23.9 0 0 0 0 24c0 3.87.93 7.52 2.58 10.78l7.41-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.9-5.8l-7.73-6c-2.14 1.43-4.88 2.28-8.17 2.28-6.52 0-12.12-4.22-14.01-10.09l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg><span>Continue with Google</span></button>
+    <div class="auth-status" id="authStatus" role="status" aria-live="polite">Checking authentication setup…</div>
+    <div class="auth-setup" id="authSetupNotice"></div>
+    <p class="auth-privacy">Google sign-in is required. Product workspace data is isolated by Supabase row-level security. Drive access is separate from sign-in and is required for local image uploads and private Drive photo previews.</p>
+  </section>
+</div>
+<div class="shell">
+  <header class="topbar">
+    <div class="brand"><div class="brand-mark">MD.</div><div><strong>Merchant Desk</strong><small>Small business, less busywork</small></div></div>
+    <div class="top-right"><span class="sync-pill" id="syncStatus" data-state="ready"><span class="local-dot"></span><span id="syncStatusText">Cloud workspace</span></span><button class="btn small" type="button" id="driveConnectBtn">Connect Drive</button><span class="muted mini" id="driveStatus">Drive not connected</span><span id="accountEmail"></span><button class="btn small ghost" type="button" id="signOutBtn">Sign out</button><div class="avatar" id="accountAvatar" title="Signed-in account">G</div></div>
+  </header>
+  <div class="workspace">
+    <nav class="nav" aria-label="Main navigation">
+      <button class="active" data-page="home"><span class="nav-icon">⌂</span>Today</button>
+      <button data-page="products"><span class="nav-icon">▦</span>Products <span id="navDraftCount"></span></button>
+      <button data-page="inventory"><span class="nav-icon">◫</span>Inventory</button>
+      <button data-page="orders"><span class="nav-icon">▤</span>Orders</button>
+      <button data-page="users"><span class="nav-icon">♙</span>Users</button>
+      <button data-page="feeds"><span class="nav-icon">⌁</span>Feed creator</button>
+      <button data-page="store"><span class="nav-icon">⌕</span>Demo search</button>
+    </nav>
+
+    <main>
+      <section class="page active" id="page-home">
+        <div class="page-head"><div><div class="eyebrow">Monday, October 12 · Your workspace</div><h1>Make today a little easier.</h1><p>The essentials first. Update a listing, fix stock, and move orders along without digging through menus.</p></div><div class="head-actions"><button class="btn" onclick="openProductModal()">＋ Add product</button><button class="btn primary" onclick="goPage('orders')">Review orders <span>↗</span></button></div></div>
+        <div class="grid stats" id="homeStats"></div>
+        <div class="grid home-grid">
+          <div>
+            <div class="panel">
+              <div class="panel-head"><div><h2>Quick actions</h2><p>Common jobs, one click away.</p></div><span class="pill green">Daily essentials</span></div>
+              <div class="quick-actions">
+                <div class="quick-card" onclick="openProductModal()"><div class="q-icon">＋</div><strong>Add or edit a product</strong><span>Details, photos, price and a draft that can wait.</span></div>
+                <div class="quick-card" onclick="goPage('inventory')"><div class="q-icon">◫</div><strong>Update stock</strong><span>Adjust quantities without opening every listing.</span></div>
+                <div class="quick-card" onclick="goPage('orders')"><div class="q-icon">▤</div><strong>Pack an order</strong><span>Copy delivery and payment details in one go.</span></div>
+                <div class="quick-card" onclick="goPage('store')"><div class="q-icon">⌕</div><strong>Preview product search</strong><span>Preview product discovery as a shopper would see it.</span></div>
+              </div>
+            </div>
+            <div class="panel" style="margin-top:15px">
+              <div class="panel-head"><div><h2>Needs your attention</h2><p>Small fixes that prevent bigger annoyances.</p></div><span class="pill orange" id="attentionCount">0 items</span></div>
+              <div class="task-list" id="attentionList"></div>
+            </div>
+          </div>
+          <div>
+            <div class="panel">
+              <div class="panel-head"><div><h2>Latest orders</h2><p>Most recent first.</p></div><button class="text-link" onclick="goPage('orders')">All orders ↗</button></div>
+              <div id="latestOrders"></div>
+            </div>
+            <div class="notice"><span class="notice-icon">✳</span><div><strong>Prototype note</strong><p>Products, drafts, inventory, feeds and orders sync to your signed-in Supabase workspace. Image files are stored in Google Drive; Supabase stores only metadata and Drive file references. Existing photos in old Supabase Storage must be migrated before you remove that old bucket.</p></div></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="page-products">
+        <div class="page-head"><div><div class="eyebrow">Catalog</div><h1>Products</h1><p>Draft a listing when you have a minute, publish it when it is ready. Your unfinished work stays here.</p></div><div class="head-actions"><button class="btn" id="resumeDraftBtn" onclick="resumeLatestDraft()">↺ Resume draft</button><button class="btn primary" onclick="openProductModal()">＋ New product</button></div></div>
+        <div class="toolbar"><div class="toolbar-left"><div class="search-wrap"><span class="search-icon">⌕</span><input class="search-input" id="productSearch" placeholder="Search name, SKU or keyword…" oninput="renderProducts()" /></div><select class="control" id="productCategoryFilter" onchange="renderProducts()"><option value="all">All categories</option></select><select class="control" id="productStatusFilter" onchange="renderProducts()"><option value="all">All statuses</option><option value="Active">Active</option><option value="Draft">Draft</option><option value="Archived">Archived</option></select></div><div class="toolbar-right"><span class="pill" id="productCount">0 products</span></div></div>
+        <div class="product-cards" id="productGrid"></div>
+        <div class="panel" style="margin-top:16px" id="draftPanel"><div class="panel-head"><div><h2>Saved drafts</h2><p>Pick up where you left off. Drafts do not appear in the demo storefront.</p></div><span class="pill yellow" id="draftCount">0 drafts</span></div><div id="draftList"></div></div>
+      </section>
+
+      <section class="page" id="page-inventory">
+        <div class="page-head"><div><div class="eyebrow">Stock control</div><h1>Inventory</h1><p>Change quantities right in the list. Low-stock items are flagged so they do not quietly become a problem.</p></div><div class="head-actions"><button class="btn" onclick="exportInventory()">↓ Export CSV</button></div></div>
+        <div class="grid stats" id="inventoryStats"></div>
+        <div class="toolbar"><div class="toolbar-left"><div class="search-wrap"><span class="search-icon">⌕</span><input class="search-input" id="inventorySearch" placeholder="Find product or SKU…" oninput="renderInventory()" /></div><select class="control" id="stockFilter" onchange="renderInventory()"><option value="all">All stock levels</option><option value="low">Low stock (1–5)</option><option value="out">Out of stock</option><option value="healthy">Healthy stock</option></select></div><div class="toolbar-right"><span class="muted mini">Tap + / − to adjust. Changes save automatically.</span></div></div>
+        <div class="panel"><div class="table-wrap"><table class="data-table"><thead><tr><th>Product</th><th>Price</th><th>In stock</th><th>Stock value</th><th>Status</th><th>Quick adjust</th></tr></thead><tbody id="inventoryRows"></tbody></table></div></div>
+      </section>
+
+      <section class="page" id="page-orders">
+        <div class="page-head"><div><div class="eyebrow">Fulfilment</div><h1>Orders</h1><p>Keep the latest delivery and payment details ready to copy. Create a demo order from Products while testing.</p></div><div class="head-actions"><button class="btn" onclick="copyLatestOrder()">▣ Copy latest details</button><button class="btn primary" onclick="openOrderModal()">＋ Demo order</button></div></div>
+        <div class="grid stats" id="orderStats"></div>
+        <div class="orders-layout"><div><div class="toolbar"><div class="toolbar-left"><div class="search-wrap"><span class="search-icon">⌕</span><input class="search-input" id="orderSearch" placeholder="Order ID, customer or product…" oninput="renderOrders()" /></div><select class="control" id="orderStatusFilter" onchange="renderOrders()"><option value="all">All order statuses</option><option>New</option><option>Packing</option><option>Shipped</option><option>Delivered</option><option>Cancelled</option></select></div><div class="toolbar-right"><span class="pill" id="orderCount">0 orders</span></div></div><div class="panel orders-list-panel"><div class="table-wrap"><table class="data-table orders-table"><thead><tr><th>Order</th><th>Customer</th><th>Total</th><th>Payment</th><th>Status</th><th>Actions</th></tr></thead><tbody id="orderRows"></tbody></table></div></div></div>
+          <aside class="panel order-detail" id="orderDetail"><div class="detail-head"><div class="eyebrow">Selected order</div><h3>Choose an order</h3><p class="muted mini" style="margin:5px 0 0">Delivery and payment information will appear here.</p></div><div class="detail-body"><div class="empty"><div class="empty-icon">▤</div><strong>No order selected</strong><span class="mini">Click a row or use the copy action.</span></div></div></aside>
+        </div>
+      </section>
+
+      <section class="page" id="page-users">
+        <div class="page-head"><div><div class="eyebrow">Customers</div><h1>Users</h1><p>A small demo customer book for building user-specific feeds. These profiles are sample data, not real customer records.</p></div><div class="head-actions"><button class="btn" onclick="toast('Demo data only. User import will be added with a backend.')">＋ Add user <span class="mini">(demo)</span></button></div></div>
+        <div class="grid stats" id="userStats"></div>
+        <div class="toolbar"><div class="toolbar-left"><div class="search-wrap"><span class="search-icon">⌕</span><input class="search-input" id="userSearch" placeholder="Search name, email or interest…" oninput="renderUsers()" /></div><select class="control" id="userSegmentFilter" onchange="renderUsers()"><option value="all">All segments</option><option value="New customer">New customer</option><option value="Repeat buyer">Repeat buyer</option><option value="VIP">VIP</option></select></div><div class="toolbar-right"><span class="pill" id="userCount">0 users</span></div></div>
+        <div class="panel"><div class="table-wrap"><table class="data-table"><thead><tr><th>Customer</th><th>Segment</th><th>Interests</th><th>Orders</th><th>Spend</th><th>Feed</th></tr></thead><tbody id="userRows"></tbody></table></div></div>
+      </section>
+
+      <section class="page" id="page-feeds">
+        <div class="page-head"><div><div class="eyebrow">Product discovery</div><h1>Feed creator</h1><p>Build a general product feed or a small, tailored collection for one customer. Review it before copying or saving.</p></div><div class="head-actions"><span class="pill green">Local preview</span></div></div>
+        <div class="feed-layout">
+          <div class="panel"><div class="panel-head"><div><h2>Configure a feed</h2><p>Pick an audience and include the products that make sense.</p></div></div><div class="panel-pad">
+            <div class="field"><label for="feedName">Feed name</label><input id="feedName" class="control" value="Everyday picks" placeholder="e.g. Weekend essentials" /></div>
+            <div class="field" style="margin-top:14px"><label>Audience</label><div style="display:flex;gap:9px;flex-wrap:wrap"><label class="pill" style="cursor:pointer;padding:9px 12px"><input type="radio" name="feedAudience" value="generic" checked style="accent-color:var(--green);margin:0 5px 0 0" onchange="toggleFeedUser()"> General feed</label><label class="pill" style="cursor:pointer;padding:9px 12px"><input type="radio" name="feedAudience" value="user" style="accent-color:var(--green);margin:0 5px 0 0" onchange="toggleFeedUser()"> Specific customer</label></div></div>
+            <div class="field" id="feedUserField" style="display:none;margin-top:12px"><label for="feedUser">Customer</label><select id="feedUser" class="control" onchange="renderFeedProductChecks()"></select></div>
+            <div class="field" style="margin-top:14px"><label for="feedCategory">Category filter</label><select id="feedCategory" class="control" onchange="renderFeedProductChecks()"><option value="all">All categories</option></select><span class="hint">Optional. Leave on all to choose any product.</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:19px"><div><div class="section-title">Include products</div><div class="muted mini" style="margin-top:3px">Active listings only by default.</div></div><button class="text-link" onclick="selectAllFeedProducts()">Select visible</button></div>
+            <div id="feedProductChecks" style="margin-top:8px"></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:17px"><button class="btn primary" onclick="generateFeed()">Generate preview ↗</button><button class="btn" onclick="saveFeed()">Save feed</button></div>
+          </div></div>
+          <div><div class="panel"><div class="panel-head"><div><h2>Feed preview</h2><p>Lightweight JSON payload for a future integration.</p></div><button class="btn small" onclick="copyFeedPreview()">▣ Copy</button></div><div class="panel-pad"><div id="feedPreviewMeta" class="muted mini" style="margin-bottom:10px">Generate a preview to see the product payload.</div><pre class="code-preview" id="feedPreview">{
+  "type": "generic",
+  "products": []
+}</pre></div></div><div class="panel" style="margin-top:15px"><div class="panel-head"><div><h2>Saved feeds</h2><p>Reusable drafts saved to your workspace.</p></div><span class="pill" id="savedFeedCount">0 saved</span></div><div class="panel-pad"><div class="feed-list" id="savedFeedsList"></div></div></div></div>
+        </div>
+      </section>
+
+      <section class="page" id="page-store">
+        <div class="page-head"><div><div class="eyebrow">Customer-side preview</div><h1>Demo product search</h1><p>Search like a shopper. Results use fixed demo relevance scoring, alongside filters and product availability.</p></div><div class="head-actions"><span class="pill blue">Storefront simulation</span></div></div>
+        <div class="store-search"><div class="store-kicker">The little shop · Preview</div><h2>Find your next favourite.</h2><form id="storeSearchForm" onsubmit="event.preventDefault();renderStore()"><input id="storeQuery" placeholder="Try “gift”, “watch”, “skin care”…" aria-label="Search products" /><button class="btn primary" type="submit">Search <span>⌕</span></button></form></div>
+        <div class="store-filter-row"><select class="control" id="storeCategory" onchange="renderStore()"><option value="all">All categories</option></select><select class="control" id="storeSort" onchange="renderStore()"><option value="relevance">Recommended</option><option value="priceAsc">Price: low to high</option><option value="priceDesc">Price: high to low</option><option value="rating">Highest rated</option></select><span class="muted mini" style="margin-left:auto">Demo relevance rules</span></div>
+        <div class="store-results-head"><strong id="storeResultCount">Products for you</strong><span class="muted mini" id="storeRuleLabel">Weighted relevance</span></div><div class="product-cards" id="storeResults"></div>
+      </section>
+    </main>
+  </div>
+  <div class="footer-note">Merchant Desk · Supabase cloud workspace · Google sign-in required</div>
+</div>
+
+<div class="modal-backdrop" id="productModalBackdrop" role="dialog" aria-modal="true" aria-labelledby="productModalTitle" onclick="if(event.target===this)closeProductModal()">
+  <div class="modal wide"><div class="modal-header"><div><h2 id="productModalTitle">Add a product</h2><p>Save the important bits first. You can finish photos and details later.</p></div><button class="close-btn" onclick="closeProductModal()" aria-label="Close">×</button></div>
+    <form id="productForm" onsubmit="event.preventDefault();saveProductFromForm()"><div class="modal-body"><input type="hidden" id="editProductId" />
+      <div class="form-grid">
+        <div class="field"><label for="pTitle">Product name *</label><input class="control" id="pTitle" required maxlength="90" placeholder="e.g. Everyday crossbody bag" /></div>
+        <div class="field"><label for="pSku">SKU / product code</label><input class="control" id="pSku" maxlength="40" placeholder="e.g. BAG-014" /></div>
+        <div class="field"><label for="pCategory">Category *</label><select class="control" id="pCategory" required><option value="Accessories">Accessories</option><option value="Home & living">Home & living</option><option value="Beauty">Beauty</option><option value="Electronics">Electronics</option><option value="Fashion">Fashion</option><option value="Gifts">Gifts</option></select></div>
+        <div class="field"><label for="pStatus">Listing status</label><select class="control" id="pStatus"><option>Active</option><option>Draft</option><option>Archived</option></select></div>
+        <div class="field"><label for="pPrice">Selling price (₹) *</label><input class="control" type="number" min="0" step="0.01" id="pPrice" required placeholder="899" /></div>
+        <div class="field"><label for="pStock">Stock quantity *</label><input class="control" type="number" min="0" step="1" id="pStock" required placeholder="20" /></div>
+        <div class="field full"><label for="pDescription">Short description</label><textarea class="control" id="pDescription" maxlength="800" placeholder="What should a customer know? Keep it simple."></textarea></div>
+        <div class="field full"><label for="pKeywords">Search keywords <span class="hint">· comma separated</span></label><input class="control" id="pKeywords" placeholder="gift, everyday, lightweight" /></div>
+        <div class="field full"><label>Product images <span class="hint">· add a few now, or leave this for later</span></label>
+          <div class="image-uploader"><div style="font-size:11px;font-weight:750">Add images from different sources</div><div class="muted mini" style="margin-top:4px">Local image files are uploaded to Google Drive when you save a product or draft. Supabase stores only Drive file IDs and product metadata. Image URLs can remain external links, or copy them to Drive with the button below.</div>
+            <div class="upload-actions"><label class="btn small" for="pFiles">↑ Upload images</label><input id="pFiles" type="file" accept="image/*" multiple hidden onchange="handleImageFiles(event)" /><button class="btn small" type="button" onclick="saveProductImagesToDrive()" id="saveImageDriveBtn">▱ Save photos to Drive</button><button class="btn small" type="button" onclick="openDraftImageLibrary()">▣ Use saved draft images</button></div>
+            <div class="image-url-row"><input class="control" id="pImageUrl" type="url" placeholder="https://example.com/product-image.jpg" /><button type="button" class="btn small" onclick="addImageUrl()">Add URL</button></div><div id="imagePreviews" class="image-previews"></div><div id="driveUploadStatus" class="drive-upload-status" aria-live="polite"></div><div id="draftImageLibrary" style="display:none;margin-top:12px"></div>
+          </div>
+        </div>
+      </div>
+    </div><div class="modal-footer"><div class="left"><span class="muted mini">* Required fields</span></div><div class="right"><button type="button" class="btn" onclick="saveProductDraft()">Save draft</button><button type="button" class="btn" onclick="closeProductModal()">Cancel</button><button type="submit" class="btn primary" id="saveProductBtn">Save product</button></div></div></form>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="orderModalBackdrop" role="dialog" aria-modal="true" aria-labelledby="orderModalTitle" onclick="if(event.target===this)closeOrderModal()"><div class="modal"><div class="modal-header"><div><h2 id="orderModalTitle">Create a demo order</h2><p>Testing only. This adds an order and reduces available stock.</p></div><button class="close-btn" onclick="closeOrderModal()" aria-label="Close">×</button></div><form onsubmit="event.preventDefault();createDemoOrder()"><div class="modal-body"><div class="form-grid"><div class="field full"><label for="oProduct">Product *</label><select class="control" id="oProduct" required></select></div><div class="field"><label for="oQty">Quantity *</label><input class="control" id="oQty" type="number" min="1" step="1" value="1" required /></div><div class="field"><label for="oUser">Customer *</label><select class="control" id="oUser" required></select></div><div class="field"><label for="oPayment">Payment method</label><select class="control" id="oPayment"><option>UPI</option><option>Cash on delivery</option><option>Card</option><option>Net banking</option></select></div><div class="field"><label for="oStatus">Order status</label><select class="control" id="oStatus"><option>New</option><option>Packing</option><option>Shipped</option><option>Delivered</option></select></div></div><div class="notice"><span class="notice-icon">↳</span><div><strong>Inventory stays in sync</strong><p>Saving this test order subtracts the quantity from stock. Cancelled orders do not automatically restock in this prototype.</p></div></div></div><div class="modal-footer"><div class="left"></div><div class="right"><button type="button" class="btn" onclick="closeOrderModal()">Cancel</button><button type="submit" class="btn primary">Create demo order</button></div></div></form></div></div>
+<div class="toast-region" id="toastRegion" aria-live="polite"></div>
+
+<script src="https://accounts.google.com/gsi/client" async defer data-merchant-drive-gis="true"></script>
+<script type="module" src="./js/bootstrap.js"></script>
+</body>
+</html>
